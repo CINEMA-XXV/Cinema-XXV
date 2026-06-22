@@ -804,3 +804,171 @@ void menuJadwal() {
         }
     } while (pilihan != 4);
 }
+
+// ===================== MANAJEMEN PROMO =====================
+
+void tampilPromo() {
+    if (jumlahPromo == 0) { cout << MERAH << "\nBelum ada promo.\n" << RESET; return; }
+    garis();
+    cout << left << setw(15) << "Kode" << setw(10) << "Diskon" << "Status" << endl;
+    garis();
+    for (int i = 0; i < jumlahPromo; i++)
+        cout << left << setw(15) << promo[i].kode
+                     << setw(10) << promo[i].diskon
+                     << (promo[i].aktif ? "Aktif" : "Nonaktif") << endl;
+    garis();
+}
+
+// Meminta input kode promo dari pengguna. Mengembalikan "exit" jika user membatalkan.
+string inputKodePromo() {
+    string kode;
+    bool valid;
+    do {
+        valid = true;
+        cout << "  (tanpa spasi, contoh: DISKON20)\nKode Promo : ";
+        getline(cin >> ws, kode);
+        if (toLower(kode) == "exit") return "exit";
+        if (kode.empty()) { cout << MERAH << "Kode tidak boleh kosong.\n" << RESET; valid = false; continue; }
+        for (int i = 0; i < (int)kode.length(); i++)
+            if (kode[i] == ' ') { cout << MERAH << "Kode promo tidak boleh mengandung spasi.\n" << RESET; valid = false; break; }
+    } while (!valid);
+    return kode;
+}
+
+void tambahPromo() {
+    header("    T A M B A H  P R O M O");
+    if (jumlahPromo >= MAX_PROMO) {
+        cout << MERAH << "\nData promo penuh, tidak bisa menambah promo baru.\n" << RESET;
+        pause(); return;
+    }
+
+    Promo p;
+    cout << MERAH << "(ketik 'exit' untuk batal)\n" << RESET;
+
+    do {
+        p.kode = inputKodePromo();
+        if (p.kode == "exit") { cout << "\nDibatalkan.\n"; pause(); return; }
+
+        if (cariPromo(p.kode) != -1)
+            cout << MERAH << "Kode promo sudah digunakan, gunakan kode lain.\n" << RESET;
+    } while (cariPromo(p.kode) != -1);
+
+    int diskon = inputAngka("Diskon (%) : ", 1, 100);
+    if (diskon == -1) { cout << "\nDibatalkan.\n"; pause(); return; }
+    p.diskon = diskon;
+
+    p.aktif = true;
+    promo[jumlahPromo++] = p;
+    cout << HIJAU_TERANG << "\nPromo berhasil ditambahkan.\n" << RESET;
+    pause();
+}
+
+void editPromo() {
+    header("    E D I T  P R O M O");
+    tampilPromo();
+    if (jumlahPromo == 0) { pause(); return; }
+
+    cout << MERAH << "(ketik 'exit' untuk batal)\n" << RESET;
+
+    string kode; int indeks;
+    do {
+        kode = inputKodePromo();
+        if (kode == "exit") { cout << "\nDibatalkan.\n"; pause(); return; }
+
+        indeks = cariPromo(kode);
+        if (indeks == -1)
+            cout << MERAH << "Promo dengan kode tersebut tidak ditemukan, silakan coba lagi.\n" << RESET;
+    } while (indeks == -1);
+
+    int diskonBaru = inputAngka("Diskon Baru : ", 1, 100);
+    if (diskonBaru == -1) { cout << "\nDibatalkan.\n"; pause(); return; }
+
+    // Input status (0=nonaktif, 1=aktif)
+    string inputStatus;
+    bool validStatus;
+    do {
+        validStatus = true;
+        cout << "Status (1=aktif, 0=nonaktif, 'exit'=batal) : "; cin >> inputStatus;
+        if (toLower(inputStatus) == "exit") { cout << "\nDibatalkan, promo tidak diubah.\n"; pause(); return; }
+        if (inputStatus != "0" && inputStatus != "1") {
+            cout << MERAH << "Input tidak valid, masukkan 0 atau 1.\n" << RESET; validStatus = false;
+        }
+    } while (!validStatus);
+
+    promo[indeks].diskon = diskonBaru;
+    promo[indeks].aktif  = (inputStatus == "1");
+    cout << HIJAU_TERANG << "\nPromo berhasil diubah.\n" << RESET;
+    pause();
+}
+
+void hapusPromo() {
+    header("    H A P U S  P R O M O");
+    tampilPromo();
+    if (jumlahPromo == 0) { pause(); return; }
+
+    cout << MERAH << "(ketik 'exit' untuk batal)\n" << RESET;
+
+    string kode; int indeks;
+    do {
+        kode = inputKodePromo();
+        if (kode == "exit") { cout << "\nDibatalkan.\n"; pause(); return; }
+
+        indeks = cariPromo(kode);
+        if (indeks == -1)
+            cout << MERAH << "Promo dengan kode tersebut tidak ditemukan, silakan coba lagi.\n" << RESET;
+    } while (indeks == -1);
+
+    for (int i = indeks; i < jumlahPromo - 1; i++) promo[i] = promo[i + 1];
+    jumlahPromo--;
+    cout << HIJAU_TERANG << "\nPromo berhasil dihapus.\n" << RESET;
+    pause();
+}
+
+void menuPromo() {
+    string opsi[5] = {"Tambah Promo", "Edit Promo", "Hapus Promo", "Lihat Promo", "Kembali"};
+    int pilihan;
+    do {
+        pilihan = pilihMenu("    M A N A J E M E N  P R O M O", opsi, 5);
+        switch (pilihan) {
+            case 0: tambahPromo(); break;
+            case 1: editPromo();   break;
+            case 2: hapusPromo();  break;
+            case 3: header("    D A F T A R  P R O M O"); tampilPromo(); pause(); break;
+        }
+    } while (pilihan != 4);
+}
+
+// ===================== LAPORAN =====================
+
+void laporanPenjualan() {
+    header("L A P O R A N  P E N J U A L A N");
+    float totalPendapatan; int totalTiket;
+    hitungTotal(&totalPendapatan, &totalTiket);
+    cout << "\nTotal Tiket Terjual : " << totalTiket      << endl;
+    cout << "Total Transaksi     : " << jumlahTransaksi  << endl;
+    cout << "Total Pendapatan    : Rp" << totalPendapatan << endl;
+    garis();
+    if (jumlahTransaksi == 0) {
+        cout << MERAH << "Belum ada transaksi.\n" << RESET;
+    } else {
+        for (int i = 0; i < jumlahTransaksi; i++)
+            cout << transaksi[i].id << "  Rp" << transaksi[i].total << endl;
+    }
+    pause();
+}
+
+// ===================== MENU ADMIN =====================
+
+void menuAdmin() {
+    string opsi[5] = {"Manajemen Film", "Manajemen Jadwal", "Manajemen Promo", "Laporan Penjualan", "Logout"};
+    int pilihan;
+    do {
+        pilihan = pilihMenu("    M E N U  A D M I N", opsi, 5);
+        switch (pilihan) {
+            case 0: menuFilm();         break;
+            case 1: menuJadwal();       break;
+            case 2: menuPromo();        break;
+            case 3: laporanPenjualan(); break;
+        }
+    } while (pilihan != 4);
+}
