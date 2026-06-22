@@ -623,3 +623,184 @@ void menuFilm() {
         }
     } while (pilihan != 4);
 }
+
+// ===================== MANAJEMEN JADWAL =====================
+
+void tampilJadwal() {
+    if (jumlahJadwal == 0) { cout << MERAH << "\nBelum ada jadwal.\n" << RESET; return; }
+    garis();
+    cout << left << setw(8)  << "ID" << setw(20) << "Film"
+                 << setw(8)  << "Studio" << setw(15) << "Tanggal" << "Jam" << endl;
+    garis();
+    for (int i = 0; i < jumlahJadwal; i++)
+        cout << left << setw(8)  << jadwal[i].id
+                     << setw(20) << film[jadwal[i].film].judul
+                     << setw(8)  << jadwal[i].studio
+                     << setw(15) << jadwal[i].tanggal
+                     << jadwal[i].jam << " - " << jadwal[i].jamSelesai << endl;
+    garis();
+}
+
+void tambahJadwal() {
+    header("    T A M B A H  J A D W A L");
+    if (jumlahFilm == 0) {
+        cout << MERAH << "\nBelum ada film, tambahkan film terlebih dahulu.\n" << RESET;
+        pause(); return;
+    }
+    if (jumlahJadwal >= MAX_JADWAL) {
+        cout << MERAH << "\nData jadwal penuh, tidak bisa menambah jadwal baru.\n" << RESET;
+        pause(); return;
+    }
+
+    tampilFilm();
+    Jadwal j;
+    cout << MERAH << "(ketik 'exit' untuk batal)\n" << RESET;
+
+    // ID Jadwal dibuat otomatis (auto increment), tidak perlu input manual.
+    j.id = idJadwalBerikutnya;
+    cout << "\nID Jadwal : " << j.id << " (otomatis)\n";
+
+    // Input ID Film
+    int idFilm, indeksFilm;
+    do {
+        idFilm = inputID("ID Film   : ");
+        if (idFilm == -1) { cout << "\nDibatalkan.\n"; pause(); return; }
+
+        indeksFilm = cariFilm(idFilm);
+        if (indeksFilm == -1)
+            cout << MERAH << "Film dengan ID tersebut tidak ditemukan, silakan coba lagi.\n" << RESET;
+    } while (indeksFilm == -1);
+    j.film = indeksFilm;
+
+    // Input Studio
+    j.studio = inputAngka("Studio (1-" + to_string(MAX_STUDIO) + ") : ", 1, MAX_STUDIO);
+    if (j.studio == -1) { cout << "\nDibatalkan.\n"; pause(); return; }
+
+    // Input Tanggal dan Jam (diulang jika bentrok dengan jadwal lain)
+    bool bentrok;
+    do {
+        cout << "\n-- Masukkan Tanggal Tayang --\n";
+        int bln = 0, tgl = 0, jamH = 0, jamM = 0;
+        inputTanggalDanJam(bln, tgl, jamH, jamM);
+        if (bln == -1) { cout << "\nDibatalkan.\n"; pause(); return; }
+
+        j.tanggal = (tgl < 10 ? "0" : "") + to_string(tgl) + "/" +
+                    (bln < 10 ? "0" : "") + to_string(bln) + "/2026";
+        j.jam      = (jamH < 10 ? "0" : "") + to_string(jamH) + "." + (jamM < 10 ? "0" : "") + to_string(jamM);
+        j.mulai    = jamKeMenit(j.jam);
+        j.selesai  = j.mulai + film[indeksFilm].durasi + 15;
+        j.jamSelesai = menitKeJam(j.selesai);
+
+        bentrok = cekBentrok(j.studio, j.tanggal, j.mulai, j.selesai, -1);
+        if (bentrok)
+            cout << MERAH << "\nJadwal bentrok dengan jadwal lain di studio yang sama, silakan masukkan tanggal/jam lain.\n" << RESET;
+    } while (bentrok);
+
+    for (int i = 0; i < TOTAL_KURSI; i++) j.kursi[i] = false;
+    jadwal[jumlahJadwal++] = j;
+    idJadwalBerikutnya++;
+    cout << HIJAU_TERANG << "\nJadwal berhasil ditambahkan (Jam " << j.jam << " - " << j.jamSelesai << ").\n" << RESET;
+    pause();
+}
+
+void editJadwal() {
+    header("    E D I T  J A D W A L");
+    tampilJadwal();
+    if (jumlahJadwal == 0) { pause(); return; }
+
+    cout << MERAH << "(ketik 'exit' untuk batal)\n" << RESET;
+    int id, indeks;
+    do {
+        id = inputID("\nMasukkan ID Jadwal : ");
+        if (id == -1) { cout << "\nDibatalkan.\n"; pause(); return; }
+
+        indeks = cariJadwal(id);
+        if (indeks == -1)
+            cout << MERAH << "Jadwal dengan ID tersebut tidak ditemukan, silakan coba lagi.\n" << RESET;
+    } while (indeks == -1);
+
+    // Input Studio Baru
+    int studioBaru = inputAngka("Studio Baru (1-" + to_string(MAX_STUDIO) + ") : ", 1, MAX_STUDIO);
+    if (studioBaru == -1) { cout << "\nDibatalkan.\n"; pause(); return; }
+
+    // Input Tanggal dan Jam Baru (diulang jika bentrok dengan jadwal lain)
+    string tanggalBaru, jamBaru;
+    int waktuMulaiBaru, waktuSelesaiBaru;
+    bool bentrok;
+    do {
+        cout << "\n-- Masukkan Tanggal Baru --\n";
+        int bln = 0, tgl = 0, jamH = 0, jamM = 0;
+        inputTanggalDanJam(bln, tgl, jamH, jamM);
+        if (bln == -1) { cout << "\nDibatalkan.\n"; pause(); return; }
+
+        tanggalBaru = (tgl < 10 ? "0" : "") + to_string(tgl) + "/" +
+                      (bln < 10 ? "0" : "") + to_string(bln) + "/2026";
+        jamBaru     = (jamH < 10 ? "0" : "") + to_string(jamH) + "." + (jamM < 10 ? "0" : "") + to_string(jamM);
+
+        waktuMulaiBaru   = jamKeMenit(jamBaru);
+        waktuSelesaiBaru = waktuMulaiBaru + film[jadwal[indeks].film].durasi + 15;
+
+        bentrok = cekBentrok(studioBaru, tanggalBaru, waktuMulaiBaru, waktuSelesaiBaru, indeks);
+        if (bentrok)
+            cout << MERAH << "\nJadwal bentrok dengan jadwal lain, silakan masukkan tanggal/jam lain.\n" << RESET;
+    } while (bentrok);
+
+    jadwal[indeks].studio     = studioBaru;
+    jadwal[indeks].tanggal    = tanggalBaru;
+    jadwal[indeks].jam        = jamBaru;
+    jadwal[indeks].mulai      = waktuMulaiBaru;
+    jadwal[indeks].selesai    = waktuSelesaiBaru;
+    jadwal[indeks].jamSelesai = menitKeJam(waktuSelesaiBaru);
+
+    cout << HIJAU_TERANG << "\nJadwal berhasil diubah.\n" << RESET;
+    pause();
+}
+
+void hapusJadwal() {
+    header("    H A P U S  J A D W A L");
+    tampilJadwal();
+    if (jumlahJadwal == 0) { pause(); return; }
+
+    cout << MERAH << "(ketik 'exit' untuk batal)\n" << RESET;
+    int id, indeks;
+    do {
+        id = inputID("\nMasukkan ID Jadwal : ");
+        if (id == -1) { cout << "\nDibatalkan.\n"; pause(); return; }
+
+        indeks = cariJadwal(id);
+        if (indeks == -1)
+            cout << MERAH << "Jadwal dengan ID tersebut tidak ditemukan, silakan coba lagi.\n" << RESET;
+    } while (indeks == -1);
+
+    bool sudahTerjual = false;
+    for (int i = 0; i < TOTAL_KURSI; i++)
+        if (jadwal[indeks].kursi[i]) { sudahTerjual = true; break; }
+    if (sudahTerjual) {
+        cout << MERAH << "\nJadwal sudah memiliki tiket terjual, tidak bisa dihapus.\n" << RESET;
+        pause(); return;
+    }
+
+    for (int i = indeks; i < jumlahJadwal - 1; i++) jadwal[i] = jadwal[i + 1];
+    jumlahJadwal--;
+    for (int i = 0; i < jumlahTransaksi; i++)
+        if (transaksi[i].jadwal > indeks) transaksi[i].jadwal--;
+    if (indeksJadwalSementara == indeks) indeksJadwalSementara = -1;
+    else if (indeksJadwalSementara > indeks) indeksJadwalSementara--;
+
+    cout << HIJAU_TERANG << "\nJadwal berhasil dihapus.\n" << RESET;
+    pause();
+}
+
+void menuJadwal() {
+    string opsi[5] = {"Tambah Jadwal", "Edit Jadwal", "Hapus Jadwal", "Lihat Jadwal", "Kembali"};
+    int pilihan;
+    do {
+        pilihan = pilihMenu(" M A N A J E M E N  J A D W A L", opsi, 5);
+        switch (pilihan) {
+            case 0: tambahJadwal(); break;
+            case 1: editJadwal();   break;
+            case 2: hapusJadwal();  break;
+            case 3: header("    D A F T A R  J A D W A L"); tampilJadwal(); pause(); break;
+        }
+    } while (pilihan != 4);
+}
