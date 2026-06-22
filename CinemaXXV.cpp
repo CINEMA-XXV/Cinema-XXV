@@ -1225,3 +1225,107 @@ void riwayatPemesanan() {
     if (!ada) cout << MERAH << "\nBelum ada riwayat pemesanan.\n" << RESET;
     pause();
 }
+
+// ===================== MENU CUSTOMER =====================
+
+void menuCustomer() {
+    string opsi[5] = {"Beranda", "Reservasi Tiket", "Cetak Tiket", "Riwayat Pemesanan", "Logout"};
+    int pilihan;
+    do {
+        pilihan = pilihMenu("  M E N U  C U S T O M E R", opsi, 5);
+        switch (pilihan) {
+            case 0: berandaCustomer(); break;
+            case 1: reservasiTiket();  break;
+            case 2: cetakTiket();      break;
+            case 3: riwayatPemesanan(); break;
+        }
+    } while (pilihan != 4);
+    indeksUserAktif = -1;
+    resetReservasiSementara();
+}
+
+// ===================== MENU UTAMA =====================
+
+void menuUtama() {
+    string opsi[3] = {"Sign Up", "Sign In", "Exit"};
+    int pilihan;
+    do {
+        pilihan = pilihMenu("   C I N E M A X X V", opsi, 3);
+        if (pilihan == 0) { signUp(); }
+        else if (pilihan == 1) {
+            int login = signIn();
+            if (login == 1)      menuAdmin();
+            else if (login == 2) menuCustomer();
+        }
+    } while (pilihan != 2);
+}
+
+// ===================== DATA DUMMY =====================
+// Fungsi ini mengisi data awal (film, jadwal, promo) agar program
+// bisa langsung diuji coba tanpa perlu input manual dari admin.
+// ID Film dan ID Jadwal tetap menggunakan sistem auto increment
+// yang sama seperti pada fitur Tambah Film / Tambah Jadwal.
+void isiDataDummy() {
+    // ---------- Film Dummy (2 film, genre bervariasi) ----------
+    film[jumlahFilm].id = idFilmBerikutnya++;
+    film[jumlahFilm].judul = "The Last Stand";
+    film[jumlahFilm].genre = "Action";
+    film[jumlahFilm].rating = "17+";
+    film[jumlahFilm].durasi = 120;
+    film[jumlahFilm].harga = 45000;
+    film[jumlahFilm].stok = TOTAL_KURSI;
+    film[jumlahFilm].terjual = 0;
+    jumlahFilm++;
+
+    film[jumlahFilm].id = idFilmBerikutnya++;
+    film[jumlahFilm].judul = "Malam Tanpa Bulan";
+    film[jumlahFilm].genre = "Horror";
+    film[jumlahFilm].rating = "21+";
+    film[jumlahFilm].durasi = 100;
+    film[jumlahFilm].harga = 40000;
+    film[jumlahFilm].stok = TOTAL_KURSI;
+    film[jumlahFilm].terjual = 0;
+    jumlahFilm++;
+
+    // ---------- Jadwal Dummy (2 jadwal, studio berbeda, tidak bentrok) ----------
+    // Jadwal 1: Film index 0, Studio 1, 25/06/2026, jam 13.00
+    jadwal[jumlahJadwal].id = idJadwalBerikutnya++;
+    jadwal[jumlahJadwal].film = 0;
+    jadwal[jumlahJadwal].studio = 1;
+    jadwal[jumlahJadwal].tanggal = "25/06/2026";
+    jadwal[jumlahJadwal].jam = "13.00";
+    jadwal[jumlahJadwal].mulai = jamKeMenit(jadwal[jumlahJadwal].jam);
+    jadwal[jumlahJadwal].selesai = jadwal[jumlahJadwal].mulai + film[jadwal[jumlahJadwal].film].durasi + 15;
+    jadwal[jumlahJadwal].jamSelesai = menitKeJam(jadwal[jumlahJadwal].selesai);
+    for (int i = 0; i < TOTAL_KURSI; i++) jadwal[jumlahJadwal].kursi[i] = false;
+    jumlahJadwal++;
+
+    // Jadwal 2: Film index 1, Studio 2, 25/06/2026, jam 15.00
+    jadwal[jumlahJadwal].id = idJadwalBerikutnya++;
+    jadwal[jumlahJadwal].film = 1;
+    jadwal[jumlahJadwal].studio = 2;
+    jadwal[jumlahJadwal].tanggal = "25/06/2026";
+    jadwal[jumlahJadwal].jam = "15.00";
+    jadwal[jumlahJadwal].mulai = jamKeMenit(jadwal[jumlahJadwal].jam);
+    jadwal[jumlahJadwal].selesai = jadwal[jumlahJadwal].mulai + film[jadwal[jumlahJadwal].film].durasi + 15;
+    jadwal[jumlahJadwal].jamSelesai = menitKeJam(jadwal[jumlahJadwal].selesai);
+    for (int i = 0; i < TOTAL_KURSI; i++) jadwal[jumlahJadwal].kursi[i] = false;
+    jumlahJadwal++;
+
+    // ---------- Promo Dummy (2 promo) ----------
+    promo[jumlahPromo].kode = "DISKON10";
+    promo[jumlahPromo].diskon = 10;
+    promo[jumlahPromo].aktif = true;
+    jumlahPromo++;
+
+    promo[jumlahPromo].kode = "DISKON20";
+    promo[jumlahPromo].diskon = 20;
+    promo[jumlahPromo].aktif = true;
+    jumlahPromo++;
+}
+
+int main() {
+    isiDataDummy();
+    menuUtama();
+    return 0;
+}
