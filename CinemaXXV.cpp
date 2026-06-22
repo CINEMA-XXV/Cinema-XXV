@@ -972,3 +972,256 @@ void menuAdmin() {
         }
     } while (pilihan != 4);
 }
+
+// ===================== FITUR CUSTOMER =====================
+
+void berandaCustomer() {
+    header(" B E R A N D A  C U S T O M E R");
+    cout << "\nSelamat datang, " << user[indeksUserAktif].username << "!\n\nDaftar Film\n";
+    tampilFilm();
+    pause();
+}
+
+void tampilKursi(int indeks) {
+    cout << "\n          [ LAYAR BIOSKOP ]\n\n     ";
+    for (int k = 1; k <= 8; k++) cout << " " << k << " ";
+    cout << endl;
+    garis();
+    for (int baris = 0; baris < 5; baris++) {
+        cout << "  " << (char)('A' + baris) << "  ";
+        for (int kolom = 0; kolom < 8; kolom++) {
+            int nomorKursi = baris * 8 + kolom;
+            if (jadwal[indeks].kursi[nomorKursi]) cout << MERAH << "[X]" << RESET;
+            else cout << HIJAU_TERANG << "[O]" << RESET;
+        }
+        cout << endl;
+    }
+    garis();
+    cout << "  Keterangan: " << HIJAU_TERANG << "[O]" << RESET << " Tersedia   "
+         << MERAH << "[X]" << RESET << " Terisi\n";
+    garis();
+}
+
+void pembayaran();
+
+void reservasiTiket() {
+    header("    R E S E R V A S I  T I K E T");
+    tampilJadwal();
+    if (jumlahJadwal == 0) { pause(); return; }
+
+    cout << MERAH << "(ketik 'exit' untuk batal)\n" << RESET;
+    int id, indeks;
+    do {
+        id = inputID("\nID Jadwal : ");
+        if (id == -1) { cout << "\nReservasi dibatalkan.\n"; pause(); return; }
+
+        indeks = cariJadwal(id);
+        if (indeks == -1)
+            cout << MERAH << "Jadwal dengan ID tersebut tidak ditemukan, silakan coba lagi.\n" << RESET;
+    } while (indeks == -1);
+
+    int kursiTersedia = 0;
+    for (int i = 0; i < TOTAL_KURSI; i++)
+        if (!jadwal[indeks].kursi[i]) kursiTersedia++;
+    if (kursiTersedia == 0) {
+        cout << MERAH << "\nMaaf, kursi pada jadwal ini sudah penuh.\n" << RESET;
+        pause(); return;
+    }
+
+    int jumlahTiket = inputAngka("Jumlah Tiket (1-" + to_string(kursiTersedia) + ") : ", 1, kursiTersedia);
+    if (jumlahTiket == -1) { cout << "\nReservasi dibatalkan.\n"; pause(); return; }
+
+    tampilKursi(indeks);
+    cout << "\nPilih kursi (contoh: A1, B3, E8), ketik 'exit' untuk batal\n";
+
+    int  kursiPilihan[TOTAL_KURSI];
+    bool batal = false;
+
+    for (int i = 0; i < jumlahTiket && !batal; i++) {
+        string inputKursi;
+        int    nomorKursi = -1;
+        bool   valid;
+        do {
+            valid = true;
+            cout << "Kursi " << i + 1 << " : "; cin >> inputKursi;
+            if (toLower(inputKursi) == "exit") { batal = true; break; }
+            if (inputKursi.length() != 2) { cout << MERAH << "Format tidak valid, contoh: A1\n" << RESET; valid = false; continue; }
+            char baris = inputKursi[0];
+            if (baris >= 'a' && baris <= 'z') baris -= 32;
+            if (baris < 'A' || baris > 'E') { cout << MERAH << "Baris tidak valid, gunakan A-E.\n" << RESET; valid = false; continue; }
+            if (!isdigit(inputKursi[1])) { cout << MERAH << "Kolom tidak valid, gunakan 1-8.\n" << RESET; valid = false; continue; }
+            int kolom = inputKursi[1] - '0';
+            if (kolom < 1 || kolom > 8) { cout << MERAH << "Kolom tidak valid, gunakan 1-8.\n" << RESET; valid = false; continue; }
+            nomorKursi = (baris - 'A') * 8 + (kolom - 1);
+            if (jadwal[indeks].kursi[nomorKursi]) { cout << MERAH << "Kursi " << baris << kolom << " sudah terisi, pilih kursi lain.\n" << RESET; valid = false; continue; }
+            for (int k = 0; k < i && valid; k++)
+                if (kursiPilihan[k] - 1 == nomorKursi) { cout << MERAH << "Kursi " << baris << kolom << " sudah dipilih sebelumnya.\n" << RESET; valid = false; }
+        } while (!valid);
+        if (!batal) kursiPilihan[i] = nomorKursi + 1;
+    }
+
+    if (batal) { cout << "\nReservasi dibatalkan.\n"; pause(); return; }
+
+    indeksJadwalSementara = indeks;
+    indeksFilmSementara   = jadwal[indeks].film;
+    jumlahTiketSementara  = jumlahTiket;
+    for (int i = 0; i < jumlahTiket; i++) kursiSementara[i] = kursiPilihan[i];
+
+    cout << "\nKursi yang dipilih:\n";
+    for (int i = 0; i < jumlahTiketSementara; i++)
+        cout << i + 1 << ". " << KUNING_TERANG << namaKursi(kursiSementara[i] - 1) << RESET << endl;
+    cout << HIJAU_TERANG << "\nReservasi berhasil.\n" << RESET;
+    pause();
+
+    pembayaran();
+}
+
+string buatIDTrx()     { return "TRX" + to_string(jumlahTransaksi + 1001); }
+string buatKodeTiket() { return "TKT" + to_string(jumlahTransaksi + 5001); }
+
+void pembayaran() {
+    header("    P E M B A Y A R A N");
+
+    if (indeksFilmSementara < 0 || indeksFilmSementara >= jumlahFilm ||
+        indeksJadwalSementara < 0 || indeksJadwalSementara >= jumlahJadwal) {
+        cout << MERAH << "\nData reservasi tidak valid. Silakan lakukan reservasi ulang.\n" << RESET;
+        resetReservasiSementara(); pause(); return;
+    }
+
+    float totalTiket = jumlahTiketSementara * film[indeksFilmSementara].harga;
+    float total      = totalTiket;
+
+    cout << "\nFilm        : " << film[indeksFilmSementara].judul << endl;
+    cout << "Total Tiket : Rp" << totalTiket << endl;
+    cout << "Total Bayar : Rp" << total << endl;
+
+    // ---------- Validasi Kode Promo (dengan kesempatan input ulang) ----------
+    float diskon = 0;
+    bool  promoSelesai = false;
+
+    do {
+        string kode;
+        cout << "\nKode Promo (ketik '-' jika tidak ada, 'exit' untuk batal) : "; cin >> kode;
+
+        if (toLower(kode) == "exit") {
+            cout << "\nPembayaran dibatalkan.\n";
+            resetReservasiSementara();
+            pause(); return;
+        }
+
+        if (kode == "-") {
+            cout << KUNING_TERANG << "\nTidak menggunakan kode promo.\n" << RESET;
+            promoSelesai = true;
+        } else {
+            int indeks = cariPromo(kode);
+            if (indeks == -1) {
+                cout << MERAH << "Kode promo tidak ditemukan, silakan coba lagi.\n" << RESET;
+            } else if (!promo[indeks].aktif) {
+                cout << MERAH << "Kode promo tidak aktif, silakan coba lagi.\n" << RESET;
+            } else {
+                diskon = total * promo[indeks].diskon / 100.0;
+                total -= diskon;
+                cout << HIJAU_TERANG << "Promo berhasil diterapkan (" << promo[indeks].diskon << "%).\n" << RESET;
+                promoSelesai = true;
+            }
+        }
+    } while (!promoSelesai);
+
+    cout << "\nDiskon      : Rp" << diskon << endl;
+    cout << "Total Akhir : Rp" << total   << endl;
+
+    if (jumlahTransaksi >= MAX_TRX) {
+        cout << MERAH << "\nData transaksi penuh, pembayaran tidak dapat diproses.\n" << RESET;
+        resetReservasiSementara();
+        pause(); return;
+    }
+
+    cout << "\nTekan sembarang tombol untuk lanjut ke pembayaran QRIS...";
+    getch();
+
+    // ---------- Tampilkan QRIS untuk pembayaran ----------
+    header("    P E M B A Y A R A N  Q R I S");
+    cout << "\nMerchant : CinemaXXV\n";
+    cout << "Metode   : QRIS\n";
+    cout << "Total    : Rp" << total << "\n\n";
+    tampilQRCode();
+    cout << "\nSilakan scan QR di atas untuk melakukan pembayaran.\n";
+    cout << "Tekan Enter setelah pembayaran QRIS selesai dilakukan...";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.get();
+
+    cout << HIJAU_TERANG << "\nPembayaran berhasil.\n" << RESET;
+    pause();
+
+    Transaksi &t  = transaksi[jumlahTransaksi];
+    t.id          = buatIDTrx();   t.kodeTiket   = buatKodeTiket();
+    t.user        = indeksUserAktif;
+    t.jadwal      = indeksJadwalSementara; t.jumlahTiket = jumlahTiketSementara;
+    t.total       = total;         t.diskon      = diskon;
+
+    for (int i = 0; i < jumlahTiketSementara; i++) {
+        t.kursi[i] = kursiSementara[i];
+        jadwal[indeksJadwalSementara].kursi[kursiSementara[i] - 1] = true;
+    }
+    film[indeksFilmSementara].terjual += jumlahTiketSementara;
+    jumlahTransaksi++;
+    resetReservasiSementara();
+}
+
+void cetakTiket() {
+    header("    C E T A K  T I K E T");
+    if (jumlahTransaksi == 0) {
+        cout << MERAH << "\nBelum ada transaksi, tidak ada tiket yang bisa dicetak.\n" << RESET;
+        pause(); return;
+    }
+
+    int indeksTransaksi = -1;
+    for (int i = jumlahTransaksi - 1; i >= 0; i--)
+        if (transaksi[i].user == indeksUserAktif) { indeksTransaksi = i; break; }
+    if (indeksTransaksi == -1) { cout << MERAH << "\nAnda belum memiliki transaksi.\n" << RESET; pause(); return; }
+
+    Transaksi &t = transaksi[indeksTransaksi];
+    if (t.jadwal < 0 || t.jadwal >= jumlahJadwal) {
+        cout << MERAH << "\nData jadwal untuk transaksi ini sudah tidak tersedia.\n" << RESET; pause(); return;
+    }
+    Jadwal &j = jadwal[t.jadwal];
+    if (j.film < 0 || j.film >= jumlahFilm) {
+        cout << MERAH << "\nData film untuk transaksi ini sudah tidak tersedia.\n" << RESET; pause(); return;
+    }
+
+    cout << "\nKode Tiket   : " << KUNING_TERANG << t.kodeTiket << RESET << endl;
+    cout << "Film         : " << film[j.film].judul << endl;
+    cout << "Tanggal      : " << j.tanggal << endl;
+    cout << "Jam          : " << j.jam << " - " << j.jamSelesai << endl;
+    cout << "Studio       : " << j.studio << endl;
+    cout << "Jumlah Tiket : " << t.jumlahTiket << endl;
+    cout << "Kursi        : ";
+    for (int i = 0; i < t.jumlahTiket; i++) {
+        cout << KUNING_TERANG << namaKursi(t.kursi[i] - 1) << RESET;
+        if (i < t.jumlahTiket - 1) cout << ", ";
+    }
+    cout << endl;
+    pause();
+}
+
+void riwayatPemesanan() {
+    header("  R I W A Y A T  P E M E S A N A N");
+    bool ada = false;
+    for (int i = 0; i < jumlahTransaksi; i++) {
+        if (transaksi[i].user != indeksUserAktif) continue;
+        ada = true;
+        cout << "\nID Transaksi : " << BIRU << transaksi[i].id << RESET << endl;
+        int indeksJadwal = transaksi[i].jadwal;
+        if (indeksJadwal >= 0 && indeksJadwal < jumlahJadwal &&
+            jadwal[indeksJadwal].film >= 0 && jadwal[indeksJadwal].film < jumlahFilm)
+            cout << "Film         : " << film[jadwal[indeksJadwal].film].judul << endl;
+        else
+            cout << "Film         : " << MERAH << "(data tidak tersedia)" << RESET << endl;
+        cout << "Jumlah Tiket : " << transaksi[i].jumlahTiket << endl;
+        cout << "Total Bayar  : Rp" << transaksi[i].total << endl;
+        cout << "Metode Bayar : " << KUNING_TERANG << "QRIS" << RESET << endl;
+        garis();
+    }
+    if (!ada) cout << MERAH << "\nBelum ada riwayat pemesanan.\n" << RESET;
+    pause();
+}
