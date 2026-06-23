@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0F0C29,50:302B63,100:F75C7E&height=200&section=header&animation=fadeIn" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:1A1208,50:8B6914,100:F4D793&height=200&section=header&animation=fadeIn" width="100%"/>
 
 <br/>
 
@@ -35,11 +35,19 @@
 
 <br/>
 
-```
-===========================================================
-** CinemaXXV — Where The Terminal Becomes The Big Screen **
-===========================================================
-```
+<table width="100%">
+<tr>
+<td align="center" style="background-color:#0d1117;">
+
+<sub>════════════════════════════════════════════════════════════════</sub>
+
+**✦ CinemaXXV — Where The Terminal Becomes The Big Screen ✦**
+
+<sub>════════════════════════════════════════════════════════════════</sub>
+
+</td>
+</tr>
+</table>
 
 <br/>
 
@@ -50,7 +58,7 @@
   <a href="#-anggota-kelompok"><img src="https://img.shields.io/badge/👥-Tim_Kami-00C853?style=for-the-badge&logoColor=white" /></a>
 </p>
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:F75C7E,100:0F0C29&height=3&section=header" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:1A1208,100:F4D793&height=3&section=header" width="100%"/>
 
 </div>
 
@@ -223,9 +231,9 @@ flowchart TD
     F --> B
 ```
 
----
-
 <div align="center">
+
+---
 
 ## 📐 Batasan & Aturan Data
 
@@ -249,9 +257,9 @@ flowchart TD
 
 ---
 
-<br/>
-
 </div>
+
+<br/>
 
 ## ⚙️ Cara Menjalankan
 
@@ -329,7 +337,7 @@ Akun customer dibuat sendiri melalui menu **Sign Up**.
 
 <br/>
 
-<img src="https://capsule-render.vercel.app/api?type=rect&color=0:F75C7E,100:0F0C29&height=3&section=header" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:1A1208,100:F4D793&height=3&section=header" width="100%"/>
 
 <div align="center">
 
@@ -343,5 +351,5 @@ Akun customer dibuat sendiri melalui menu **Sign Up**.
 
 </div>
 
-
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:F75C7E,50:302B63,100:0F0C29&height=180&section=footer&animation=fadeIn" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=rect&color=0:1A1208,100:F4D793&height=3&section=header" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:F4D793,50:8B6914,100:1A1208&height=180&section=footer&animation=fadeIn" width="100%"/>
