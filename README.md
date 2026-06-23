@@ -1,279 +1,199 @@
+<div align="center">
+
 # 🎬 CinemaXXV
-### *Movie Ticket Reservation System*
 
-**EST. 2026** — *Where Every Seat Tells a Story*
+### Sistem Reservasi Tiket Bioskop — Console App (C++)
 
----
+![C++](https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)
+![Platform](https://img.shields.io/badge/Platform-Windows%20Console-0078D6?style=for-the-badge&logo=windows&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
+![Kelompok](https://img.shields.io/badge/Kelompok-20-orange?style=for-the-badge)
 
-![C++](https://img.shields.io/badge/Language-C++-00599C?style=for-the-badge&logo=cplusplus&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Active-gold?style=for-the-badge)
-![Version](https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge)
-![Team](https://img.shields.io/badge/Team-Kelompok%2020-blueviolet?style=for-the-badge)
-
-> *"Nikmati pengalaman bioskop terbaik dari ujung jarimu — reservasi tiket, pilih kursi, pesan snack, semua dalam satu sistem."*
+*Pesan tiket bioskop favoritmu langsung dari terminal — pilih film, pilih kursi, bayar lewat QRIS, cetak tiket. Semua dari console.*
 
 </div>
 
 ---
 
-## 📌 Daftar Isi
+## 📋 Daftar Isi
 
-- [Tentang Project](#-tentang-project)
-- [Fitur Unggulan](#-fitur-unggulan)
-- [Alur Sistem](#-alur-sistem)
-- [Struktur Menu](#-struktur-menu)
+- [Tentang Proyek](#-tentang-proyek)
+- [Fitur Utama](#-fitur-utama)
+- [Alur Aplikasi](#-alur-aplikasi)
+- [Batasan & Aturan Data](#-batasan--aturan-data)
 - [Cara Menjalankan](#-cara-menjalankan)
-- [Tim Pengembang](#-tim-pengembang)
+- [Akun Default](#-akun-default)
+- [Pratinjau Tampilan](#-pratinjau-tampilan)
+- [Anggota Kelompok](#-anggota-kelompok)
 
 ---
 
-## 🎥 Tentang Project
+## 🎯 Tentang Proyek
 
-**CinemaXXV** adalah sistem reservasi tiket bioskop berbasis konsol yang dibangun menggunakan **C++**. Project ini dikembangkan sebagai bagian dari tugas akhir oleh **Kelompok 20**, dirancang untuk mensimulasikan pengalaman pemesanan tiket bioskop yang lengkap dan realistis.
+**CinemaXXV** adalah sistem reservasi tiket bioskop berbasis **C++ (console application)**. Aplikasi ini mensimulasikan proses bisnis bioskop secara end-to-end: admin mengelola film, jadwal, dan promo, sementara customer bisa memesan tiket, memilih kursi secara visual, membayar dengan QRIS dummy, hingga mencetak tiket dan melihat riwayat pemesanan.
 
-Dari login, memilih film, memilih kursi, memesan makanan, hingga mencetak tiket — semua tersedia dalam satu sistem yang terintegrasi. 🍿
-
----
-
-## ✨ Fitur Unggulan
-
-| Fitur | Deskripsi |
-|-------|-----------|
-| 🔐 **Autentikasi Pengguna** | Sistem login & registrasi dengan validasi panjang karakter |
-| 🎬 **Manajemen Film** | Admin dapat menambah, mengedit, dan menghapus data film |
-| 🗓️ **Penjadwalan Tayang** | Atur studio, tanggal, dan jam tayang dengan fleksibel |
-| 💺 **Pemilihan Kursi** | Layout kursi interaktif dengan validasi kursi terisi |
-| 🍔 **Pemesanan Makanan** | Menu makanan, minuman, dan paket combo tersedia |
-| 🏷️ **Kode Promo** | Diskon otomatis saat input kode promo yang valid |
-| 💳 **Pembayaran Virtual Account** | Simulasi pembayaran cashless yang realistis |
-| 🎟️ **Cetak Tiket** | Generate kode tiket unik dengan detail lengkap |
-| 📊 **Dashboard Admin** | Statistik real-time: pendapatan, film terlaris, dan lainnya |
-| 📜 **Riwayat Transaksi** | Lihat semua riwayat pemesanan beserta nomor Virtual Account |
+> 💡 **Kenapa menarik?** Semua dikerjakan tanpa database eksternal — murni array & struct di memori, dengan validasi input yang cukup ketat (bentrok jadwal, kursi duplikat, kode promo, dll).
 
 ---
 
-## 🔄 Alur Sistem
-
-```
-[ MULAI ]
-    │
-    ▼
-┌─────────────┐
-│    LOGIN    │
-└──────┬──────┘
-       │
-   ┌───┴───┐
-   │       │
-   ▼       ▼
-[ADMIN] [CUSTOMER]
-   │       │
-   │       ├─► Lihat & Cari Film
-   │       ├─► Reservasi Tiket
-   │       ├─► Pilih Kursi
-   │       ├─► Pesan Makanan
-   │       ├─► Pembayaran
-   │       └─► Cetak Tiket 🎟️
-   │
-   ├─► Manajemen Film
-   ├─► Manajemen Jadwal
-   ├─► Manajemen Promo
-   └─► Laporan Penjualan 📊
-```
-
----
-
-## 🗂️ Struktur Menu
+## ✨ Fitur Utama
 
 <details>
-<summary>🔐 <b>LOGIN</b> — Klik untuk expand</summary>
+<summary><b>🔐 Autentikasi (Sign Up / Sign In)</b></summary>
+<br>
 
-```
-LOGIN
-│
-├── SIGN UP
-│   ├── Input Username  (dibatasi karakter)
-│   └── Input Password  (dibatasi karakter)
-│
-├── SIGN IN
-│   ├── Input Username
-│   └── Input Password
-│
-└── EXIT
-```
+- Sign Up dengan validasi: username tidak boleh kosong, mengandung spasi, sama dengan `admin`, atau duplikat
+- Sign In mendukung akun **admin tetap** maupun **customer terdaftar**
+- Bisa membatalkan input kapan saja dengan mengetik `exit`
+
+</details>
+
+<details>
+<summary><b>🛠️ Panel Admin</b></summary>
+<br>
+
+| Modul | Kemampuan |
+|---|---|
+| 🎞️ **Manajemen Film** | Tambah (ID auto-increment mulai `1001`), edit, hapus *(ditolak jika masih dipakai jadwal)*, lihat daftar diurutkan dari tiket terjual terbanyak |
+| 🗓️ **Manajemen Jadwal** | Tambah (ID auto-increment mulai `2001`), edit, hapus *(ditolak jika sudah ada tiket terjual)*, dengan **validasi bentrok** studio + tanggal + jam |
+| 🏷️ **Manajemen Promo** | Tambah kode promo unik, atur diskon 1–100%, aktif/nonaktifkan, hapus |
+| 📊 **Laporan Penjualan** | Total tiket terjual, total transaksi, total pendapatan, daftar transaksi |
+
+</details>
+
+<details>
+<summary><b>🎟️ Sisi Customer</b></summary>
+<br>
+
+- **Beranda** — lihat daftar film yang tersedia
+- **Reservasi Tiket** — pilih jadwal, lihat layout kursi visual (5 baris × 8 kolom), pilih kursi format `A1`–`E8`, dengan validasi kursi terisi/duplikat
+- **Pembayaran** — ringkasan pesanan → input kode promo (opsional) → tampilan QR dummy → konfirmasi → ID transaksi & kode tiket otomatis
+- **Cetak Tiket** — tampilkan detail tiket dari transaksi terakhir
+- **Riwayat Pemesanan** — semua transaksi milik user yang sedang login
+
 </details>
 
 ---
 
-<details>
-<summary>🛡️ <b>ADMIN</b> — Klik untuk expand</summary>
+## 🔄 Alur Aplikasi
 
+```mermaid
+flowchart TD
+    A([Mulai]) --> B{LOGIN}
+    B -->|Sign Up| C[Buat Akun Baru]
+    B -->|Sign In| D{Validasi Akun}
+    B -->|Exit| Z([Keluar])
+    C --> B
+    D -->|Admin| E[📊 Menu Admin]
+    D -->|Customer| F[🎟️ Menu Customer]
+
+    E --> E1[Manajemen Film]
+    E --> E2[Manajemen Jadwal]
+    E --> E3[Manajemen Promo]
+    E --> E4[Laporan Penjualan]
+    E --> B
+
+    F --> F1[Beranda]
+    F --> F2[Reservasi Tiket]
+    F2 --> F2a[Pilih Jadwal & Kursi]
+    F2a --> F3[Pembayaran QRIS]
+    F3 --> F4[Cetak Tiket]
+    F --> F5[Riwayat Pemesanan]
+    F --> B
 ```
-ADMIN
-│
-├── 📊 Dashboard Admin
-│   ├── Total Film
-│   ├── Total Customer
-│   ├── Total Tiket Terjual
-│   ├── Total Transaksi
-│   ├── Total Pendapatan
-│   └── Film Terlaris
-│
-├── 🎬 Manajemen Film
-│   ├── Tambah Film (ID, Judul, Genre, Durasi, Rating, Harga, Stok)
-│   ├── Edit Film
-│   ├── Hapus Film
-│   └── Lihat Daftar Film
-│
-├── 🗓️ Manajemen Jadwal
-│   ├── Tambah Jadwal (Film, Studio, Tanggal, Jam)
-│   ├── Edit Jadwal
-│   ├── Hapus Jadwal
-│   └── Lihat Jadwal
-│
-├── 🏷️ Manajemen Promo
-│   ├── Tambah Promo (Kode, Diskon, Status)
-│   ├── Edit Promo
-│   ├── Hapus Promo
-│   └── Lihat Promo
-│
-├── 📈 Laporan Penjualan
-│   ├── Total Tiket Terjual
-│   ├── Total Pendapatan
-│   ├── Total Transaksi
-│   ├── Data Transaksi
-│   └── Film Terlaris
-│
-└── 🚪 Logout
-```
-</details>
 
 ---
 
-<details>
-<summary>👤 <b>CUSTOMER</b> — Klik untuk expand</summary>
+## 📐 Batasan & Aturan Data
 
-```
-CUSTOMER
-│
-├── 🏠 Beranda
-│   ├── Lihat Daftar Film
-│   ├── Cari Film (Judul / Genre)
-│   ├── Urutkan Film (A-Z, Z-A, Termurah, Termahal)
-│   └── Lihat Detail Film (Judul, Genre, Durasi, Rating, Harga, Sisa Tiket)
-│
-├── 🎟️ Reservasi Tiket
-│   ├── Pilih Film
-│   ├── Pilih Tanggal Jadwal
-│   ├── Pilih Studio
-│   ├── Pilih Jumlah Tiket
-│   ├── Lihat Layout Kursi
-│   ├── Pilih Kursi
-│   └── Validasi Kursi Terisi
-│
-├── 🍿 Pemesanan Makanan
-│   ├── Lihat Menu
-│   ├── Pilih Makanan
-│   ├── Pilih Minuman
-│   ├── Pilih Paket Combo
-│   └── Hitung Total Pesanan
-│
-├── 💳 Pembayaran
-│   ├── Ringkasan Pesanan
-│   ├── Input Kode Promo
-│   ├── Hitung Diskon
-│   ├── Generate Virtual Account
-│   ├── Simulasi Pembayaran Cashless
-│   └── Konfirmasi Pembayaran
-│
-├── 🖨️ Cetak Tiket
-│   ├── Generate Kode Tiket
-│   ├── Tampilkan Detail Tiket
-│   └── Simpan Tiket
-│
-├── 📜 Riwayat Pemesanan
-│   ├── Riwayat Tiket
-│   ├── Riwayat Transaksi
-│   └── Detail Pemesanan (+ Nomor Virtual Account)
-│
-└── 🚪 Logout
-```
-</details>
+| Aspek | Aturan |
+|---|---|
+| Maks. User | 30 |
+| Maks. Film | 20 |
+| Maks. Jadwal | 30 |
+| Maks. Promo | 10 |
+| Maks. Transaksi | 50 |
+| Jumlah Studio | 3 |
+| Kursi per Studio | 40 (5 baris `A–E` × 8 kolom) |
+| ID Film | Auto increment, mulai `1001` |
+| ID Jadwal | Auto increment, mulai `2001` |
+| Durasi Film | 40–360 menit |
+| Harga Tiket | Rp25.000 – Rp300.000 |
+| Genre | Action / Horror / Comedy / Drama / Animasi |
+| Rating Usia | SU / 13+ / 17+ / 21+ |
+| Tanggal Tayang | Juni–Desember 2026 (Juni mulai tanggal 23) |
+| Metode Bayar | QRIS (visual dummy, simulasi) |
 
 ---
 
-## 🚀 Cara Menjalankan
+## ⚙️ Cara Menjalankan
 
-### Prasyarat
-Pastikan kamu sudah menginstall compiler C++ di sistemmu:
-- **GCC / G++** (Linux/Mac)
-- **MinGW** (Windows)
-- **Visual Studio** (Windows)
-
-### Langkah Kompilasi & Eksekusi
+> ⚠️ Program ini menggunakan `<conio.h>` (`getch()`), sehingga **hanya berjalan di Windows** (atau via MinGW/CodeBlocks di Windows). Untuk tampilan warna ANSI, gunakan **Windows Terminal** atau cmd/PowerShell modern.
 
 ```bash
-# 1. Clone repository ini
-git clone https://github.com/kelompok20/CinemaXXV.git
-
-# 2. Masuk ke direktori project
-cd CinemaXXV
-
-# 3. Kompilasi program
+# Compile dengan g++ (MinGW)
 g++ -o CinemaXXV main.cpp
 
-# 4. Jalankan program
-./CinemaXXV          # Linux / Mac
-CinemaXXV.exe        # Windows
+# Jalankan
+CinemaXXV.exe
 ```
 
-### Akun Default
+Atau buka langsung di **Code::Blocks** / **Visual Studio** lalu *Build & Run*.
+
+---
+
+## 🔑 Akun Default
 
 | Role | Username | Password |
-|------|----------|----------|
-| 👑 Admin | `admin` | `admin123` |
-| 👤 Customer | Daftar sendiri via Sign Up | — |
+|---|---|---|
+| Admin | `admin` | `admin123` |
+
+Akun customer dibuat sendiri melalui menu **Sign Up**.
+
+> 🎬 Saat program pertama dijalankan, 2 film, 2 jadwal, dan 2 kode promo dummy (`DISKON10`, `DISKON20`) otomatis tersedia untuk uji coba.
 
 ---
 
-## 👥 Tim Pengembang
+## 🖥️ Pratinjau Tampilan
+
+<details>
+<summary><b>Lihat contoh layout kursi (klik untuk buka)</b></summary>
+<br>
+
+```
+          [ LAYAR BIOSKOP ]
+
+      1  2  3  4  5  6  7  8
+============================================================
+  A  [O][O][X][O][O][O][O][O]
+  B  [O][O][O][O][X][O][O][O]
+  C  [O][O][O][O][O][O][O][O]
+  D  [O][X][O][O][O][O][O][O]
+  E  [O][O][O][O][O][O][O][O]
+============================================================
+  Keterangan: [O] Tersedia   [X] Terisi
+```
+
+</details>
+
+---
+
+## 👥 Anggota Kelompok
+
+| Nama | NIM |
+|---|---|
+| I Putu Reynanda Putra Dynatha | F1D02510115 |
+| Lalu Reza Pramandika | F1D02510013 |
+| Naira Almira | F1D02510085 |
+| Silva Sazkia Damayanti | F1D02510026 |
+| Alya Zulfadila | F1D02510102 |
+| Putri Riyona Ibtisaamah | F1D02510131 |
+| Yohanes Ibrani | F1D02510142 |
 
 <div align="center">
 
-### 🏆 Kelompok 20
-
-*Dengan bangga mempersembahkan CinemaXXV — EST. 2026*
-
-</div>
-
 ---
 
-<div align="center">
-
-### 🌟 Struktur Konsep C++ yang Digunakan
-
-| Konsep | Implementasi |
-|--------|-------------|
-| `struct / class` | Data Film, Jadwal, Transaksi, User |
-| `array / vector` | Menyimpan daftar film, kursi, menu |
-| `string` | Input nama, kode promo, judul film |
-| `function` | Modularisasi setiap fitur menu |
-| `loop & kondisi` | Validasi input, navigasi menu |
-| `file I/O` | Penyimpanan data transaksi & tiket |
-
-</div>
-
----
-
-<div align="center">
-
-🎬 **CinemaXXV** — *Movie Ticket Reservation System*
-
-**EST. 2026** | Built with ❤️ by **Kelompok 20**
-
-*"Lights, Camera, Code!"* 🎥
-
----
-
-⭐ Jangan lupa kasih **Star** kalau project ini bermanfaat!
+Dibuat dengan ❤️ oleh **Kelompok 20** — CinemaXXV 🎬🍿
 
 </div>
